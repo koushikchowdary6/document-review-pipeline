@@ -51,14 +51,41 @@ def decide(bundle, status, reviewer, rationale):
         'rationale': rationale.strip(),
         'reviewed_at_utc': datetime.now(timezone.utc).isoformat(),
         'sanitized_sha256': manifest['sanitized_sha256'],
+        'manifest_sha256': manifest_digest(manifest),
     }
     _write_exclusive(Path(bundle) / 'decision.json', json.dumps(record, indent=2) + '\n')
     return record
 
 
+def manifest_digest(manifest):
+    canonical = json.dumps(manifest, sort_keys=True, separators=(',', ':'), allow_nan=False)
+    return hashlib.sha256(canonical.encode('utf-8')).hexdigest()
+
+
+def review_status(bundle):
+    manifest, _ = verify_bundle(bundle)
+    path = Path(bundle) / 'decision.json'
+    if not path.exists():
+        return {'status': 'pending_manual_review', 'export_allowed': False}
+    decision = json.loads(path.read_text(encoding='utf-8'))
+    if (not isinstance(decision, dict)
+            or decision.get('schema_version') != 1
+            or decision.get('status') not in ('approved', 'rejected')
+            or decision.get('manifest_sha256') != manifest_digest(manifest)
+            or decision.get('sanitized_sha256') != manifest['sanitized_sha256']
+            or not isinstance(decision.get('reviewer'), str)
+            or not decision['reviewer'].strip()
+            or not isinstance(decision.get('rationale'), str)
+            or not decision['rationale'].strip()):
+        raise ValueError('Decision is invalid or no longer matches reviewed manifest')
+    return {'status': decision['status'], 'export_allowed': decision['status'] == 'approved'}
+
+
 def export_approved(bundle, destination):
     manifest, sanitized = verify_bundle(bundle)
     decision = json.loads((Path(bundle) / 'decision.json').read_text(encoding='utf-8'))
+    if not review_status(bundle)['export_allowed']:
+        raise ValueError('Review has not approved export')
     if (not isinstance(decision, dict) or decision.get('schema_version') != 1
             or decision.get('status') != 'approved'
             or decision.get('sanitized_sha256') != manifest['sanitized_sha256']
@@ -75,6 +102,8 @@ def export_approved(bundle, destination):
 if __name__ == '__main__':
     p = argparse.ArgumentParser(description=__doc__)
     commands = p.add_subparsers(dest='command', required=True)
+    status = commands.add_parser('status', help='Inspect review state without exporting text')
+    status.add_argument('bundle', type=Path)
     review = commands.add_parser('decide', help='Record one manual decision per bundle')
     review.add_argument('bundle', type=Path)
     review.add_argument('--status', choices=('approved', 'rejected'), required=True)
@@ -85,7 +114,9 @@ if __name__ == '__main__':
     release.add_argument('destination', type=Path)
     args = p.parse_args()
     try:
-        if args.command == 'decide':
+        if args.command == 'status':
+            print(json.dumps(review_status(args.bundle)))
+        elif args.command == 'decide':
             record = decide(args.bundle, args.status, args.reviewer, args.rationale)
             print(json.dumps({'status': record['status']}))
         else:
