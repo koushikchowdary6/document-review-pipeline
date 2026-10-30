@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -50,3 +51,8 @@ class IntegrityControlsTests(unittest.TestCase):
         self.assertNotIn('sanitized_text',view)
         self.assertNotIn('demo@example.com',json.dumps(view))
         self.assertIn('sanitized_text',inspect_bundle(self.bundle,True))
+
+    @unittest.skipUnless(hasattr(os,'mkfifo'),'POSIX FIFO test')
+    def test_fifo_is_rejected_without_waiting_for_a_writer(self):
+        p=self.bundle/'sanitized.txt';p.unlink();os.mkfifo(p)
+        with self.assertRaises(ValueError):verify_bundle(self.bundle)

@@ -144,7 +144,7 @@ python -m pip install -r requirements-dev.txt
 python -m pytest -q
 ```
 
-**285 tests passed locally** for this feature: upstream detection regressions plus
+**286 tests passed locally** for this feature: upstream detection regressions plus
 review states, altered text/metadata, legacy decisions, malformed timestamps,
 symlink/budget rejection, one-snapshot export, publication failures, hand-calculated
 metric cases, report reproducibility, and the synthetic end-to-end demo.
