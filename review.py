@@ -9,6 +9,7 @@ import shutil
 import sys
 import tempfile
 from redactor import MAX_INPUT_CHARS, redact
+from integrity import MAX_BUNDLE_BYTES
 
 
 def build(source, destination):
@@ -20,6 +21,8 @@ def build(source, destination):
     if len(text) > MAX_INPUT_CHARS:
         raise ValueError('Input exceeds budget')
     sanitized, findings = redact(text)
+    if len(sanitized.encode('utf-8')) > MAX_BUNDLE_BYTES:
+        raise ValueError('Sanitized output exceeds bundle byte budget')
     manifest = {
         'schema_version': 1,
         'source_sha256': hashlib.sha256(text.encode()).hexdigest(),

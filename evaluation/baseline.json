@@ -1,0 +1,296 @@
+{
+  "by_kind": {
+    "ADDRESS": {
+      "false_negatives": 1,
+      "false_positives": 0,
+      "precision": null,
+      "recall": 0.0,
+      "true_positives": 0
+    },
+    "AWS_ACCESS_KEY": {
+      "false_negatives": 0,
+      "false_positives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "true_positives": 1
+    },
+    "CONFIG_SECRET": {
+      "false_negatives": 0,
+      "false_positives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "true_positives": 1
+    },
+    "CREDIT_CARD": {
+      "false_negatives": 0,
+      "false_positives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "true_positives": 1
+    },
+    "EMAIL": {
+      "false_negatives": 0,
+      "false_positives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "true_positives": 6
+    },
+    "IPV4": {
+      "false_negatives": 0,
+      "false_positives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "true_positives": 1
+    },
+    "IPV6": {
+      "false_negatives": 0,
+      "false_positives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "true_positives": 1
+    },
+    "JSON_SECRET": {
+      "false_negatives": 0,
+      "false_positives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "true_positives": 1
+    },
+    "PERSON": {
+      "false_negatives": 1,
+      "false_positives": 0,
+      "precision": null,
+      "recall": 0.0,
+      "true_positives": 0
+    },
+    "PHONE": {
+      "false_negatives": 2,
+      "false_positives": 2,
+      "precision": 0.3333333333333333,
+      "recall": 0.3333333333333333,
+      "true_positives": 1
+    },
+    "SSN": {
+      "false_negatives": 1,
+      "false_positives": 0,
+      "precision": 1.0,
+      "recall": 0.6666666666666666,
+      "true_positives": 2
+    }
+  },
+  "case_count": 26,
+  "cases": [
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "email_plain",
+      "true_positive_count": 1
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "email_plus",
+      "true_positive_count": 1
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "two_emails",
+      "true_positive_count": 2
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "email_subdomain",
+      "true_positive_count": 1
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "ssn_dashes",
+      "true_positive_count": 1
+    },
+    {
+      "false_negatives": [
+        {
+          "end": 25,
+          "kind": "SSN",
+          "start": 14
+        }
+      ],
+      "false_positives": [],
+      "id": "ssn_spaces",
+      "true_positive_count": 0
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "phone_us",
+      "true_positive_count": 1
+    },
+    {
+      "false_negatives": [
+        {
+          "end": 19,
+          "kind": "PHONE",
+          "start": 5
+        }
+      ],
+      "false_positives": [
+        {
+          "end": 19,
+          "kind": "PHONE",
+          "start": 6
+        }
+      ],
+      "id": "phone_parens",
+      "true_positive_count": 0
+    },
+    {
+      "false_negatives": [
+        {
+          "end": 20,
+          "kind": "PHONE",
+          "start": 5
+        }
+      ],
+      "false_positives": [
+        {
+          "end": 20,
+          "kind": "PHONE",
+          "start": 6
+        }
+      ],
+      "id": "phone_international",
+      "true_positive_count": 0
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "card_test",
+      "true_positive_count": 1
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "ipv4",
+      "true_positive_count": 1
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "ipv6",
+      "true_positive_count": 1
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "aws_example",
+      "true_positive_count": 1
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "yaml_secret",
+      "true_positive_count": 1
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "json_secret",
+      "true_positive_count": 1
+    },
+    {
+      "false_negatives": [
+        {
+          "end": 20,
+          "kind": "PERSON",
+          "start": 8
+        }
+      ],
+      "false_positives": [],
+      "id": "context_name",
+      "true_positive_count": 0
+    },
+    {
+      "false_negatives": [
+        {
+          "end": 26,
+          "kind": "ADDRESS",
+          "start": 11
+        }
+      ],
+      "false_positives": [],
+      "id": "context_address",
+      "true_positive_count": 0
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "mixed",
+      "true_positive_count": 2
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "safe_sentence",
+      "true_positive_count": 0
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "safe_version",
+      "true_positive_count": 0
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "safe_counter",
+      "true_positive_count": 0
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "safe_identifier",
+      "true_positive_count": 0
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "invalid_card",
+      "true_positive_count": 0
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "safe_email_word",
+      "true_positive_count": 0
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "safe_threshold",
+      "true_positive_count": 0
+    },
+    {
+      "false_negatives": [],
+      "false_positives": [],
+      "id": "safe_url",
+      "true_positive_count": 0
+    }
+  ],
+  "dataset_sha256": "d2595d80955e68f80a94f0b51b1a1a1187b9412c7e75129ad1ccb2d3c698a332",
+  "detector_sha256": "af36c3a284f3a18236aa4206ecbf0218b4bd9777e978b95302426d6af9675354",
+  "flagged_negative_documents": 0,
+  "matching": "Exact kind + original-text character span; micro-averaged entities",
+  "negative_document_false_positive_rate": 0.0,
+  "negative_documents": 8,
+  "overall": {
+    "false_negatives": 5,
+    "false_positives": 2,
+    "precision": 0.8823529411764706,
+    "recall": 0.75,
+    "true_positives": 15
+  },
+  "schema_version": 1
+}
