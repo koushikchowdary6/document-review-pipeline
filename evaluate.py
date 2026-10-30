@@ -27,12 +27,14 @@ def load_cases(path):
             if (not isinstance(entity,dict) or set(entity) != {'kind','start','end'}
                     or not isinstance(entity['kind'],str) or not re.fullmatch('[A-Z][A-Z0-9_]*',entity['kind'])
                     or type(entity['start']) is not int or type(entity['end']) is not int
-                    or not previous <= entity['start'] < entity['end'] <= len(case['text'])):
+                    or not 0 <= entity['start'] < entity['end'] <= len(case['text'])):
                 raise ValueError('Invalid annotation span')
             label=(entity['kind'],entity['start'],entity['end'])
             if label in labels:
                 raise ValueError('Duplicate ground-truth entity span')
             labels.add(label)
+            if entity['start'] < previous:
+                raise ValueError('Overlapping or out-of-order annotation spans')
             previous=entity['end']
     return data
 
