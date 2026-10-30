@@ -129,8 +129,10 @@ It refuses pending, rejected, modified and malformed evidence.
 
 - Duplicate-key and nonfinite JSON rejection, digest/metadata validation, bounded
   8 MB bundle-entry reads, and regular-file/no-symlink reads where `O_NOFOLLOW` exists.
-- Original source text is capped at 1,000,000 characters. Oversized sanitized output
-  is rejected before publication; no partial result is forwarded.
+- Original source text must be a regular UTF-8 file (not a symlink, FIFO, or
+  device on supported POSIX platforms). Ingestion uses bounded, nonblocking,
+  no-symlink reads; text is capped at 1,000,000 characters and 8 MB of input.
+  Oversized sanitized output is rejected before publication.
 - Decisions and exports use private same-directory staging, fsync, and atomic
   no-clobber hard-link publication. Existing paths are never overwritten; failed
   publication leaves no partial destination. Unsupported filesystems fail closed.
