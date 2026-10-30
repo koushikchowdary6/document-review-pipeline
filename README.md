@@ -99,3 +99,19 @@ flowchart TD
 
 See [PROVENANCE.md](PROVENANCE.md) for the exact upstream snapshot and file mapping.
 The existing upstream license is retained unchanged; no new license grant is introduced.
+
+## Inspecting review status and manifest integrity
+
+```bash
+python decision.py status /tmp/review-bundle
+```
+
+The command returns `pending_manual_review`, `approved`, or `rejected`, plus an
+`export_allowed` boolean, without exporting text. Invalid bundles fail nonzero.
+New decisions bind approval to a canonical digest of the entire manifest,
+including source identity and finding metadata. Editing metadata after review
+invalidates status/export; merely reformatting JSON does not. Legacy decisions
+without this binding fail closed: build and review a new bundle instead.
+The manifest remains a pending source record; `decision.json` holds the decision.
+This is self-attestation on a trusted local filesystem, not a digital signature.
+The full suite now contains 270 passing tests, including six status/integrity cases.
