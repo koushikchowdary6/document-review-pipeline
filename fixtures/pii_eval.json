@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "provenance": "Manually annotated synthetic examples. No real customer or patient records. Includes unsupported contextual PERSON and ADDRESS labels to expose recall limits.",
+  "cases": [
+    {
+      "id": "email_plain",
+      "text": "Contact demo@example.com today.",
+      "entities": [
+        {
+          "kind": "EMAIL",
+          "start": 8,
+          "end": 24
+        }
+      ]
+    },
+    {
+      "id": "email_plus",
+      "text": "Write to qa+review@example.org.",
+      "entities": [
+        {
+          "kind": "EMAIL",
+          "start": 9,
+          "end": 30
+        }
+      ]
+    },
+    {
+      "id": "two_emails",
+      "text": "From a@example.com to b@example.net",
+      "entities": [
+        {
+          "kind": "EMAIL",
+          "start": 5,
+          "end": 18
+        },
+        {
+          "kind": "EMAIL",
+          "start": 22,
+          "end": 35
+        }
+      ]
+    },
+    {
+      "id": "email_subdomain",
+      "text": "Use first.last@support.example.com",
+      "entities": [
+        {
+          "kind": "EMAIL",
+          "start": 4,
+          "end": 34
+        }
+      ]
+    },
+    {
+      "id": "ssn_dashes",
+      "text": "Synthetic SSN 123-45-6789",
+      "entities": [
+        {
+          "kind": "SSN",
+          "start": 14,
+          "end": 25
+        }
+      ]
+    },
+    {
+      "id": "ssn_spaces",
+      "text": "Synthetic SSN 123 45 6789",
+      "entities": [
+        {
+          "kind": "SSN",
+          "start": 14,
+          "end": 25
+        }
+      ]
+    },
+    {
+      "id": "phone_us",
+      "text": "Call 202-555-0148 for the fictional case.",
+      "entities": [
+        {
+          "kind": "PHONE",
+          "start": 5,
+          "end": 17
+        }
+      ]
+    },
+    {
+      "id": "phone_parens",
+      "text": "Call (202) 555-0148 for help.",
+      "entities": [
+        {
+          "kind": "PHONE",
+          "start": 5,
+          "end": 19
+        }
+      ]
+    },
+    {
+      "id": "phone_international",
+      "text": "Call +1-202-555-0148.",
+      "entities": [
+        {
+          "kind": "PHONE",
+          "start": 5,
+          "end": 20
+        }
+      ]
+    },
+    {
+      "id": "card_test",
+      "text": "Test payment 4111 1111 1111 1111",
+      "entities": [
+        {
+          "kind": "CREDIT_CARD",
+          "start": 13,
+          "end": 32
+        }
+      ]
+    },
+    {
+      "id": "ipv4",
+      "text": "Source address 192.0.2.42",
+      "entities": [
+        {
+          "kind": "IPV4",
+          "start": 15,
+          "end": 25
+        }
+      ]
+    },
+    {
+      "id": "ipv6",
+      "text": "Peer 2001:db8::1",
+      "entities": [
+        {
+          "kind": "IPV6",
+          "start": 5,
+          "end": 16
+        }
+      ]
+    },
+    {
+      "id": "aws_example",
+      "text": "Example AKIAIOSFODNN7EXAMPLE",
+      "entities": [
+        {
+          "kind": "AWS_ACCESS_KEY",
+          "start": 8,
+          "end": 28
+        }
+      ]
+    },
+    {
+      "id": "yaml_secret",
+      "text": "password: short-example",
+      "entities": [
+        {
+          "kind": "CONFIG_SECRET",
+          "start": 10,
+          "end": 23
+        }
+      ]
+    },
+    {
+      "id": "json_secret",
+      "text": "{\"api_key\":\"example-only\"}",
+      "entities": [
+        {
+          "kind": "JSON_SECRET",
+          "start": 12,
+          "end": 24
+        }
+      ]
+    },
+    {
+      "id": "context_name",
+      "text": "Patient Mira Example requests a callback.",
+      "entities": [
+        {
+          "kind": "PERSON",
+          "start": 8,
+          "end": 20
+        }
+      ]
+    },
+    {
+      "id": "context_address",
+      "text": "Deliver to 12 Fiction Lane.",
+      "entities": [
+        {
+          "kind": "ADDRESS",
+          "start": 11,
+          "end": 26
+        }
+      ]
+    },
+    {
+      "id": "mixed",
+      "text": "Mail demo@example.com; SSN 123-45-6789",
+      "entities": [
+        {
+          "kind": "EMAIL",
+          "start": 5,
+          "end": 21
+        },
+        {
+          "kind": "SSN",
+          "start": 27,
+          "end": 38
+        }
+      ]
+    },
+    {
+      "id": "safe_sentence",
+      "text": "Review the synthetic document before indexing.",
+      "entities": []
+    },
+    {
+      "id": "safe_version",
+      "text": "Release version 2.4.1 is ready.",
+      "entities": []
+    },
+    {
+      "id": "safe_counter",
+      "text": "The batch contains 42 records and 7 warnings.",
+      "entities": []
+    },
+    {
+      "id": "safe_identifier",
+      "text": "Document ref ABC-123 is pending.",
+      "entities": []
+    },
+    {
+      "id": "invalid_card",
+      "text": "Order reference 4111 1111 1111 1112",
+      "entities": []
+    },
+    {
+      "id": "safe_email_word",
+      "text": "An email address is required for contact.",
+      "entities": []
+    },
+    {
+      "id": "safe_threshold",
+      "text": "Temperature threshold is 60 degrees.",
+      "entities": []
+    },
+    {
+      "id": "safe_url",
+      "text": "Documentation https://example.org/help is public.",
+      "entities": []
+    }
+  ]
+}

@@ -6,3 +6,6 @@ __pycache__/
 .env
 bundles/
 released/
+demo-data/
+demo-ci/
+.publish-*
