@@ -18,15 +18,23 @@ def load_cases(path):
         if not isinstance(case,dict) or not isinstance(case.get('id'),str) or not re.fullmatch('[a-z0-9_-]{1,64}',case['id']) or case['id'] in ids:
             raise ValueError('Invalid or duplicate case ID')
         ids.add(case['id'])
-        if not isinstance(case.get('text'),str) or len(case['text']) > 10000 or not isinstance(case.get('entities'),list):
+        if (set(case) != {'id','text','entities'} or not isinstance(case.get('text'),str)
+                or len(case['text']) > 10000 or not isinstance(case.get('entities'),list)):
             raise ValueError('Invalid case text or labels')
         previous=0
+        labels=set()
         for entity in case['entities']:
             if (not isinstance(entity,dict) or set(entity) != {'kind','start','end'}
                     or not isinstance(entity['kind'],str) or not re.fullmatch('[A-Z][A-Z0-9_]*',entity['kind'])
                     or type(entity['start']) is not int or type(entity['end']) is not int
-                    or not previous <= entity['start'] < entity['end'] <= len(case['text'])):
+                    or not 0 <= entity['start'] < entity['end'] <= len(case['text'])):
                 raise ValueError('Invalid annotation span')
+            label=(entity['kind'],entity['start'],entity['end'])
+            if label in labels:
+                raise ValueError('Duplicate ground-truth entity span')
+            labels.add(label)
+            if entity['start'] < previous:
+                raise ValueError('Overlapping or out-of-order annotation spans')
             previous=entity['end']
     return data
 
