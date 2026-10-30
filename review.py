@@ -9,15 +9,17 @@ import shutil
 import sys
 import tempfile
 from redactor import MAX_INPUT_CHARS, redact
-from integrity import MAX_BUNDLE_BYTES
+from integrity import MAX_BUNDLE_BYTES, read_text
 
 
 def build(source, destination):
     source, destination = Path(source), Path(destination)
     if destination.exists():
         raise ValueError('Destination exists; choose a new review bundle directory')
-    with source.open(encoding='utf-8') as stream:
-        text = stream.read(MAX_INPUT_CHARS + 1)
+    # Apply the same bounded, no-symlink regular-file boundary to the raw
+    # source as to review-bundle entries. FIFOs must not hang ingestion and
+    # symlinked sources must not bypass the caller's selected input path.
+    text = read_text(source)
     if len(text) > MAX_INPUT_CHARS:
         raise ValueError('Input exceeds budget')
     sanitized, findings = redact(text)
