@@ -49,7 +49,24 @@ def evaluate(path):
     counts=Counter();kinds={};rows=[];negative_docs=0;flagged_negative_docs=0
     for case in data['cases']:
         expected={(e['kind'],e['start'],e['end']) for e in case['entities']}
-        actual={(e.kind,e.start,e.end) for e in detect(case['text'])}
+        # Do not silently collapse duplicate predictions into a set or count
+        # impossible spans as valid false positives. A broken detector adapter
+        # must fail evaluation rather than publishing misleading precision.
+        actual=set()
+        previous_end=0
+        for finding in detect(case['text']):
+            kind,start,end=finding.kind,finding.start,finding.end
+            if (not isinstance(kind,str) or not re.fullmatch('[A-Z][A-Z0-9_]*',kind)
+                    or type(start) is not int or type(end) is not int
+                    or not 0 <= start < end <= len(case['text'])):
+                raise ValueError('Invalid detector prediction span')
+            if start < previous_end:
+                raise ValueError('Overlapping or out-of-order detector predictions')
+            prediction=(kind,start,end)
+            if prediction in actual:
+                raise ValueError('Duplicate detector prediction span')
+            actual.add(prediction)
+            previous_end=end
         tp,fp,fn=actual & expected,actual-expected,expected-actual
         counts.update(tp=len(tp),fp=len(fp),fn=len(fn))
         for kind in {x[0] for x in expected | actual}:
