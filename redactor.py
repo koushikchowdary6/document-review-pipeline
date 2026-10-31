@@ -21,7 +21,9 @@ import argparse
 import ipaddress
 import json
 import math
+import os
 import re
+import stat
 import sys
 from dataclasses import dataclass
 
@@ -389,6 +391,29 @@ def redact(
     return "".join(out), public_findings
 
 
+
+def _read_input_file(path: str) -> str:
+    """Read only a bounded regular UTF-8 file; reject symlinks and FIFOs.
+
+    Match the upstream LLM PII Redactor CLI safety boundary. Checking the
+    opened descriptor and using O_NONBLOCK/O_NOFOLLOW protects against
+    path swaps after lstat() on supporting operating systems.
+    """
+    metadata = os.lstat(path)
+    if not stat.S_ISREG(metadata.st_mode):
+        raise ValueError("input must be a regular file (no symlinks)")
+    if metadata.st_size > 4 * MAX_INPUT_CHARS:
+        raise ValueError(f"input exceeds {MAX_INPUT_CHARS} characters")
+    flags = os.O_RDONLY | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_NOFOLLOW", 0)
+    with os.fdopen(os.open(path, flags), "r", encoding="utf-8") as stream:
+        opened = os.fstat(stream.fileno())
+        if not stat.S_ISREG(opened.st_mode):
+            raise ValueError("input must be a regular file")
+        if opened.st_size > 4 * MAX_INPUT_CHARS:
+            raise ValueError(f"input exceeds {MAX_INPUT_CHARS} characters")
+        return stream.read(MAX_INPUT_CHARS + 1)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Redact PII/secrets from text before sending it to an LLM.")
     parser.add_argument("path", nargs="?", help="text file to redact; omit to read stdin")
@@ -396,8 +421,10 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.path:
-        with open(args.path, encoding="utf-8") as stream:
-            text = stream.read(MAX_INPUT_CHARS + 1)
+        try:
+            text = _read_input_file(args.path)
+        except (OSError, ValueError, UnicodeError):
+            parser.error("unable to read a bounded regular UTF-8 input file")
     else:
         text = sys.stdin.read(MAX_INPUT_CHARS + 1)
     if len(text) > MAX_INPUT_CHARS:
