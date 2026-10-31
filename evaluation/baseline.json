@@ -4,63 +4,63 @@
       "false_negatives": 1,
       "false_positives": 0,
       "precision": null,
-      "recall": 0.0,
+      "recall": 0,
       "true_positives": 0
     },
     "AWS_ACCESS_KEY": {
       "false_negatives": 0,
       "false_positives": 0,
-      "precision": 1.0,
-      "recall": 1.0,
+      "precision": 1,
+      "recall": 1,
       "true_positives": 1
     },
     "CONFIG_SECRET": {
       "false_negatives": 0,
       "false_positives": 0,
-      "precision": 1.0,
-      "recall": 1.0,
+      "precision": 1,
+      "recall": 1,
       "true_positives": 1
     },
     "CREDIT_CARD": {
       "false_negatives": 0,
       "false_positives": 0,
-      "precision": 1.0,
-      "recall": 1.0,
+      "precision": 1,
+      "recall": 1,
       "true_positives": 1
     },
     "EMAIL": {
       "false_negatives": 0,
       "false_positives": 0,
-      "precision": 1.0,
-      "recall": 1.0,
+      "precision": 1,
+      "recall": 1,
       "true_positives": 6
     },
     "IPV4": {
       "false_negatives": 0,
       "false_positives": 0,
-      "precision": 1.0,
-      "recall": 1.0,
+      "precision": 1,
+      "recall": 1,
       "true_positives": 1
     },
     "IPV6": {
       "false_negatives": 0,
       "false_positives": 0,
-      "precision": 1.0,
-      "recall": 1.0,
+      "precision": 1,
+      "recall": 1,
       "true_positives": 1
     },
     "JSON_SECRET": {
       "false_negatives": 0,
       "false_positives": 0,
-      "precision": 1.0,
-      "recall": 1.0,
+      "precision": 1,
+      "recall": 1,
       "true_positives": 1
     },
     "PERSON": {
       "false_negatives": 1,
       "false_positives": 0,
       "precision": null,
-      "recall": 0.0,
+      "recall": 0,
       "true_positives": 0
     },
     "PHONE": {
@@ -73,7 +73,7 @@
     "SSN": {
       "false_negatives": 1,
       "false_positives": 0,
-      "precision": 1.0,
+      "precision": 1,
       "recall": 0.6666666666666666,
       "true_positives": 2
     }
@@ -280,10 +280,10 @@
     }
   ],
   "dataset_sha256": "d2595d80955e68f80a94f0b51b1a1a1187b9412c7e75129ad1ccb2d3c698a332",
-  "detector_sha256": "af36c3a284f3a18236aa4206ecbf0218b4bd9777e978b95302426d6af9675354",
+  "detector_sha256": "04cfd2fbd97c51ba6aca3c4f37cb0f633f13715b6db39cac6617138834dbe8fa",
   "flagged_negative_documents": 0,
   "matching": "Exact kind + original-text character span; micro-averaged entities",
-  "negative_document_false_positive_rate": 0.0,
+  "negative_document_false_positive_rate": 0,
   "negative_documents": 8,
   "overall": {
     "false_negatives": 5,
