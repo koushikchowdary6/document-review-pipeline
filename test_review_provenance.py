@@ -37,8 +37,8 @@ class ReviewProvenanceTests(unittest.TestCase):
         self.assertTrue(self.export.is_file())
 
     def test_invisible_or_spoofed_reviewer_cannot_approve(self):
-        for label in ('Alice\\u202e', 'Al\\u200bice', 'Alice\\nAdmin', '\\u034f',
-                      'Alice\\ufe0f', '\\ud800'):
+        for label in ('Alice\u202e', 'Al\u200bice', 'Alice\nAdmin', '\u034f',
+                      'Alice\ufe0f', '\ud800'):
             with self.subTest(label=repr(label)):
                 with self.assertRaises(ValueError):
                     self._approve(label)
@@ -46,7 +46,7 @@ class ReviewProvenanceTests(unittest.TestCase):
 
     def test_tampered_reviewer_is_rejected_on_export(self):
         self._approve()
-        self._change_record(reviewer='Alice\\u202e')
+        self._change_record(reviewer='Alice\u202e')
         with self.assertRaises(ValueError):
             export_approved(self.bundle, self.export)
         self.assertFalse(self.export.exists())
