@@ -75,9 +75,9 @@ def _valid_reviewer(value):
             for char in label)
         and not any(
             unicodedata.category(char) in {'Cc', 'Cf', 'Cs', 'Zl', 'Zp'}
-            or char == '\\u034f'
-            or '\\ufe00' <= char <= '\\ufe0f'
-            or '\\U000e0100' <= char <= '\\U000e01ef'
+            or char == '\u034f'
+            or '\ufe00' <= char <= '\ufe0f'
+            or '\U000e0100' <= char <= '\U000e01ef'
             for char in label
         )
     )
