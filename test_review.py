@@ -19,6 +19,40 @@ class Tests(unittest.TestCase):
             source=Path(d)/'in'; source.write_text('test')
             out=Path(d)/'bundle'; build(source,out)
             with self.assertRaises(ValueError): build(source,out)
+    def test_dangling_destination_symlink_is_not_replaced(self):
+        import os
+        if not hasattr(os, 'symlink'):
+            self.skipTest('symlinks unavailable')
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            source = root / 'input.txt'
+            source.write_text('demo@example.com', encoding='utf-8')
+            destination = root / 'bundle'
+            destination.symlink_to(root / 'missing-target', target_is_directory=True)
+            with self.assertRaises(ValueError):
+                build(source, destination)
+            self.assertTrue(destination.is_symlink())
+            self.assertFalse((root / 'missing-target').exists())
+            self.assertEqual(list(root.glob('.review-*')), [])
+
+    def test_destination_created_during_redaction_is_not_replaced(self):
+        import review
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            source = root / 'input.txt'
+            source.write_text('demo@example.com', encoding='utf-8')
+            destination = root / 'bundle'
+            original_redact = review.redact
+            def create_destination(text):
+                destination.mkdir()
+                return original_redact(text)
+            with patch('review.redact', side_effect=create_destination):
+                with self.assertRaises(ValueError):
+                    build(source, destination)
+            self.assertTrue(destination.is_dir())
+            self.assertEqual(list(destination.iterdir()), [])
+            self.assertEqual(list(root.glob('.review-*')), [])
+
     def test_budget_leaves_no_bundle(self):
         with tempfile.TemporaryDirectory() as d:
             source=Path(d)/'in'; source.write_text('12345')
