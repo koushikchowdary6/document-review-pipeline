@@ -138,6 +138,9 @@ It refuses pending, rejected, modified and malformed evidence.
   publication leaves no partial destination. Unsupported filesystems fail closed.
 - Review bundles are private directories on POSIX. Error messages do not echo input.
   Hashes identify content; they do not encrypt data or prevent guessing.
+- The entropy fallback counts character frequencies in one pass instead of
+  repeatedly scanning long untrusted candidate secrets. [Regression tests](tests/test_entropy_frequency_work.py)
+  verify a long synthetic secret is still masked without exposing raw values.
 
 ## Tests and CI
 
@@ -146,12 +149,13 @@ python -m pip install -r requirements-dev.txt
 python -m pytest -q
 ```
 
-**286 tests passed locally** for this feature: upstream detection regressions plus
-review states, altered text/metadata, legacy decisions, malformed timestamps,
-symlink/budget rejection, one-snapshot export, publication failures, hand-calculated
-metric cases, report reproducibility, and the synthetic end-to-end demo.
-[GitHub Actions](https://github.com/koushikchowdary6/document-review-pipeline/actions/workflows/ci.yml)
-runs on Python 3.10 and 3.12. The badge reflects main, not an unmerged feature branch.
+[GitHub Actions](https://github.com/koushikchowdary6/document-review-pipeline/actions/runs/41294865716)
+passed on Python 3.10 and 3.12 after the entropy optimization and refreshed
+detector fingerprint. The suite covers detection regressions, long-secret
+redaction, review states, changed evidence, malformed timestamps,
+symlink/budget rejection, one-snapshot export, publication failures, exact
+synthetic metrics, reproducible reports, and the end-to-end demo.
+The badge reflects main, not an unmerged feature branch.
 
 ## Decisions, tradeoffs and limitations
 
