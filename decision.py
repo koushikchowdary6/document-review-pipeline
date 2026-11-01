@@ -1,13 +1,14 @@
 """Local manual review and fail-closed export, not authenticated identity."""
 import argparse
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import os
 from pathlib import Path
 import re
 import tempfile
+import unicodedata
 from integrity import loads, read_text
 
 
@@ -62,10 +63,30 @@ def manifest_digest(manifest):
     return hashlib.sha256(canonical.encode('utf-8')).hexdigest()
 
 
+def _valid_reviewer(value):
+    """Keep unauthenticated reviewer labels visible and unambiguous in audits."""
+    if not isinstance(value, str) or not 1 <= len(value.strip()) <= 128:
+        return False
+    label = value.strip()
+    # Ordinary names may contain accents; invisible/bidi characters and
+    # controls can make a review label appear to identify somebody else.
+    return (
+        any(not unicodedata.category(char).startswith('M') and not char.isspace()
+            for char in label)
+        and not any(
+            unicodedata.category(char) in {'Cc', 'Cf', 'Cs', 'Zl', 'Zp'}
+            or char == '\u034f'
+            or '\ufe00' <= char <= '\ufe0f'
+            or '\U000e0100' <= char <= '\U000e01ef'
+            for char in label
+        )
+    )
+
+
 def decide(bundle,status,reviewer,rationale):
     if status not in ('approved','rejected'):
         raise ValueError('Decision must be approved or rejected')
-    if not isinstance(reviewer,str) or not 1 <= len(reviewer.strip()) <= 128:
+    if not _valid_reviewer(reviewer):
         raise ValueError('Reviewer must be 1..128 characters')
     if not isinstance(rationale,str) or not 1 <= len(rationale.strip()) <= 2000:
         raise ValueError('Rationale must be 1..2000 characters')
@@ -79,17 +100,24 @@ def decide(bundle,status,reviewer,rationale):
 
 def _verified_decision(bundle,manifest):
     record=loads(read_text(Path(bundle)/'decision.json'))
-    if (not isinstance(record,dict) or type(record.get('schema_version')) is not int
+    if (not isinstance(record,dict) or set(record) != {
+            'schema_version','status','reviewer','rationale','reviewed_at_utc',
+            'sanitized_sha256','manifest_sha256'}
+            or type(record.get('schema_version')) is not int
             or record['schema_version'] != 1 or record.get('status') not in ('approved','rejected')
             or record.get('manifest_sha256') != manifest_digest(manifest)
             or record.get('sanitized_sha256') != manifest['sanitized_sha256']
-            or not isinstance(record.get('reviewer'),str) or not 1 <= len(record['reviewer'].strip()) <= 128
+            or not _valid_reviewer(record.get('reviewer'))
             or not isinstance(record.get('rationale'),str) or not 1 <= len(record['rationale'].strip()) <= 2000
             or not isinstance(record.get('reviewed_at_utc'),str)):
         raise ValueError('Decision is invalid or no longer matches reviewed manifest')
     stamp=datetime.fromisoformat(record['reviewed_at_utc'])
-    if stamp.tzinfo is None:
-        raise ValueError('Review timestamp requires timezone')
+    if stamp.tzinfo is None or stamp.utcoffset() != timedelta(0):
+        raise ValueError('Review timestamp must use UTC')
+    # A future-dated record can falsely imply that review occurred later.
+    # Allow small local clock skew, but reject impossible future approvals.
+    if stamp > datetime.now(timezone.utc) + timedelta(minutes=5):
+        raise ValueError('Review timestamp is in the future')
     return record
 
 
