@@ -280,7 +280,7 @@
     }
   ],
   "dataset_sha256": "d2595d80955e68f80a94f0b51b1a1a1187b9412c7e75129ad1ccb2d3c698a332",
-  "detector_sha256": "04cfd2fbd97c51ba6aca3c4f37cb0f633f13715b6db39cac6617138834dbe8fa",
+  "detector_sha256": "5e11ba465aabeb3c4ee8aa890ce85dc533e0c38eb60c6609f20a52fadff30e6a",
   "flagged_negative_documents": 0,
   "matching": "Exact kind + original-text character span; micro-averaged entities",
   "negative_document_false_positive_rate": 0,
