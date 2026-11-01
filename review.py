@@ -14,7 +14,9 @@ from integrity import MAX_BUNDLE_BYTES, read_text
 
 def build(source, destination):
     source, destination = Path(source), Path(destination)
-    if destination.exists():
+    # Path.exists() follows symlinks and returns False for dangling links.
+    # Refuse those destinations too: rename() would otherwise replace them.
+    if os.path.lexists(destination):
         raise ValueError('Destination exists; choose a new review bundle directory')
     # Apply the same bounded, no-symlink regular-file boundary to the raw
     # source as to review-bundle entries. FIFOs must not hang ingestion and
@@ -42,6 +44,12 @@ def build(source, destination):
         os.chmod(stage, 0o700)
         (stage / 'sanitized.txt').write_text(sanitized, encoding='utf-8')
         (stage / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
+        # Check again after redaction: another local process may have created
+        # the path while the bundle was staged. This narrows the race, but
+        # atomic no-clobber directory rename is not portable in Python; the
+        # documented single-writer assumption still applies.
+        if os.path.lexists(destination):
+            raise ValueError('Destination exists; choose a new review bundle directory')
         # Both files become visible as a bundle. Intended for a single local writer.
         stage.rename(destination)
     except BaseException:
