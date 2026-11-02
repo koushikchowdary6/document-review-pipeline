@@ -49,6 +49,31 @@ class PredictionIntegrityTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError, 'Overlapping or out-of-order'):
                         evaluate(self.path)
 
+    def test_prediction_value_must_match_original_span(self):
+        # A detector adapter can report correct offsets but a fabricated or
+        # normalized value. Do not award an exact-span true positive for it.
+        for finding in (
+            Finding('EMAIL', 'wrong', 0, 1),
+            Finding('EMAIL', '', 0, 1),
+            Finding('EMAIL', None, 0, 1),
+            Finding('EMAIL', 'a ', 0, 1),
+        ):
+            with self.subTest(finding=finding):
+                with patch('evaluate.detect', return_value=[finding]):
+                    with self.assertRaisesRegex(ValueError, 'Invalid detector prediction'):
+                        evaluate(self.path)
+
+    def test_prediction_value_consistency_preserves_unicode_offsets(self):
+        self.path.write_text(json.dumps({
+            'schema_version': 1,
+            'cases': [{'id': 'emoji', 'text': '🚀a', 'entities': [
+                {'kind': 'EMAIL', 'start': 1, 'end': 2},
+            ]}],
+        }), encoding='utf-8')
+        with patch('evaluate.detect', return_value=[Finding('EMAIL', 'a', 1, 2)]):
+            report = evaluate(self.path)
+        self.assertEqual(report['overall']['true_positives'], 1)
+
     def test_valid_distinct_predictions_are_scored_as_false_positives(self):
         findings = [Finding('EMAIL', 'a', 0, 1), Finding('SSN', 'c', 4, 5)]
         with patch('evaluate.detect', return_value=findings):
