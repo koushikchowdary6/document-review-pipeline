@@ -117,8 +117,12 @@ review. Zero flagged negatives in eight examples is not proof of a zero false-po
 rate in deployment. Unsupported entity types remain in the denominator so recall
 limitations are visible. Metrics without an eligible denominator are `null`.
 
-Reports never contain matched values or full document text. Output files are created
-exclusively rather than overwriting an older report. No external API is called.
+Reports never contain matched values or full document text. Evaluation rejects
+escaped lone Unicode surrogates in JSON case text, since they are not valid UTF-8
+scalars and would make exact original-text character offsets ambiguous. Valid
+astral characters (including emoji) retain Python's decoded character indexing.
+Output files are created exclusively rather than overwriting an older report.
+No external API is called.
 
 ## Security controls and engineering challenges
 
