@@ -3,8 +3,10 @@ import argparse
 from collections import Counter
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
+import tempfile
 from integrity import loads, read_text
 from redactor import detect
 
@@ -93,6 +95,30 @@ def evaluate(path):
             'by_kind':{k:rates(c['tp'],c['fp'],c['fn']) for k,c in sorted(kinds.items())},'cases':rows}
 
 
+def write_report_exclusive(destination, serialized):
+    """Publish a complete evaluation report without overwriting prior evidence.
+
+    Stage and fsync in the destination directory, then atomically hard-link
+    the finished file to its final name. Unlike open('x') followed by writes,
+    an interrupted export cannot leave a truncated report at that name.
+    A preexisting destination (including a symlink) remains untouched.
+    """
+    destination = Path(destination)
+    fd, staging = tempfile.mkstemp(
+        prefix=f'.{destination.name}.', suffix='.tmp', dir=destination.parent
+    )
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as stream:
+            stream.write(serialized)
+            stream.flush()
+            os.fsync(stream.fileno())
+        # Same-directory hard linking is atomic and fails if the destination
+        # already exists. Do not use os.replace: reports are immutable evidence.
+        os.link(staging, destination)
+    finally:
+        os.unlink(staging)
+
+
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--dataset',type=Path,default=Path(__file__).parent/'fixtures/pii_eval.json')
@@ -102,7 +128,7 @@ if __name__=='__main__':
         result=evaluate(args.dataset)
         serialized=json.dumps(result,indent=2,sort_keys=True,allow_nan=False)+'\n'
         if args.output:
-            with args.output.open('x',encoding='utf-8') as stream:stream.write(serialized)
+            write_report_exclusive(args.output, serialized)
         print(serialized,end='')
     except (ValueError,OSError,UnicodeError,RecursionError):
         p.exit(1,'Evaluation rejected: check dataset labels and output destination.\n')
