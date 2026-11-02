@@ -21,6 +21,12 @@ def load_cases(path):
         if (set(case) != {'id','text','entities'} or not isinstance(case.get('text'),str)
                 or len(case['text']) > 10000 or not isinstance(case.get('entities'),list)):
             raise ValueError('Invalid case text or labels')
+        # JSON permits escaped lone UTF-16 surrogates even when the file is
+        # valid UTF-8. Such values cannot represent original UTF-8 document
+        # text and make exact character-offset scoring non-reproducible.
+        # Valid surrogate pairs are decoded into one Unicode scalar by JSON.
+        if any(0xD800 <= ord(char) <= 0xDFFF for char in case['text']):
+            raise ValueError('Case text contains an invalid Unicode surrogate')
         previous=0
         labels=set()
         for entity in case['entities']:
