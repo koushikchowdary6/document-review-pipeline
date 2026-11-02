@@ -64,7 +64,9 @@ def evaluate(path):
             kind,start,end=finding.kind,finding.start,finding.end
             if (not isinstance(kind,str) or not re.fullmatch('[A-Z][A-Z0-9_]*',kind)
                     or type(start) is not int or type(end) is not int
-                    or not 0 <= start < end <= len(case['text'])):
+                    or not 0 <= start < end <= len(case['text'])
+                    or not isinstance(finding.value, str)
+                    or finding.value != case['text'][start:end]):
                 raise ValueError('Invalid detector prediction span')
             if start < previous_end:
                 raise ValueError('Overlapping or out-of-order detector predictions')
