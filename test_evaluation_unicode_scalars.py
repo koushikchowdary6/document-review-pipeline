@@ -29,7 +29,7 @@ class EvaluationUnicodeScalarTests(unittest.TestCase):
     def test_escaped_lone_high_and_low_surrogates_are_rejected(self):
         # json.dumps emits \\ud800/\\udfff as ASCII escapes; UTF-8 file
         # decoding alone does not protect against these malformed values.
-        for text in ("prefix\\ud800suffix", "\\udfff", "\\ud800"):
+        for text in ("prefix\ud800suffix", "\udfff", "\ud800"):
             with self.subTest(text=repr(text)):
                 self.write(text)
                 with self.assertRaisesRegex(ValueError, "Unicode surrogate"):
